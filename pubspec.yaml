@@ -1,0 +1,64 @@
+name: instant_code_app
+description: 马上码 - 轻量级工具应用，快速将剪贴板内容转换为各类编码格式
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # 剪贴板管理
+  clipboard: ^0.1.3
+
+  # 编码生成
+  qr_flutter: ^4.1.0
+  barcode_widget: ^2.0.4
+
+  # 本地存储
+  sqflite: ^2.3.0
+  path_provider: ^2.1.1
+  shared_preferences: ^2.2.2
+
+  # 权限管理
+  permission_handler: ^11.1.0
+
+  # 图片保存
+  image_gallery_saver: ^2.0.3
+  path: ^1.8.3
+  screenshot: ^3.0.0
+
+  # 系统功能
+  share_plus: ^7.2.1
+  gallery_saver: ^2.3.2
+  screen_brightness: ^0.2.2+1
+  sensors_plus: ^4.0.2
+
+  # UI增强
+  flutter_slidable: ^3.0.1
+  flutter_staggered_animations: ^1.1.1
+
+  # 状态管理
+  provider: ^6.1.1
+
+  # UI组件
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
