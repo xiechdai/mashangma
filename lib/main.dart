@@ -1,12 +1,14 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:clipboard/clipboard.dart';
-import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
+
+// 只导入Web平台需要的包
+import 'dart:html' as html;
+
+// 其他平台的包在需要时通过条件编译使用
 
 // Models
 import 'models/code_type.dart';
@@ -65,7 +67,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _textController = TextEditingController();
-  final ScreenshotController _screenshotController = ScreenshotController();
   String _currentText = '';
   CodeType _selectedCodeType = CodeType.qrCode;
   bool _isFavorite = false;
@@ -220,13 +221,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _shareCode() async {
     try {
-      final imageBytes = await _screenshotController.capture();
-      if (imageBytes != null) {
-        final tempDir = await getTemporaryDirectory();
-        final file = await File('${tempDir.path}/code_${DateTime.now().millisecondsSinceEpoch}.png').writeAsBytes(imageBytes);
-        
-        await Share.shareXFiles([XFile(file.path)], text: '马上码生成: $_currentText');
-      }
+      // 暂时移除截图功能，直接分享文本
+      await Share.share(_currentText, subject: '马上码生成');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -238,30 +234,21 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _saveToGallery() async {
     try {
-      final status = await Permission.storage.request();
-      if (status.isGranted) {
-        final imageBytes = await _screenshotController.capture();
-        if (imageBytes != null) {
-          final result = await ImageGallerySaver.saveImage(imageBytes);
-          if (result['isSuccess'] == true) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('已保存到相册')),
-              );
-            }
-          }
-        }
-      } else {
+      if (kIsWeb) {
+        // Web平台：显示提示，告知用户手动截图
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('需要存储权限')),
+            const SnackBar(content: Text('请使用浏览器截图功能保存')),
           );
         }
+      } else {
+        // 非Web平台：直接分享文本
+        await Share.share(_currentText, subject: '马上码生成');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存失败: $e')),
+          SnackBar(content: Text('操作失败: $e')),
         );
       }
     }
@@ -393,70 +380,67 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    return Screenshot(
-      controller: _screenshotController,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // 编码显示
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // 编码显示
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: CodeGenerator().generateCodeWidget(
-                _currentText,
-                type: _selectedCodeType,
-                size: 300,
-              ),
+            child: CodeGenerator().generateCodeWidget(
+              _currentText,
+              type: _selectedCodeType,
+              size: 300,
             ),
-            
-            const SizedBox(height: 8),
-            
-            // 内容信息
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                '${_selectedCodeType.displayName} • ${_currentText.length} 字符',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // 内容信息
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '${_selectedCodeType.displayName} • ${_currentText.length} 字符',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
               ),
             ),
-            
-            // 操作按钮
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _buildShareButton(),
-                const SizedBox(width: 8),
-                _buildExportButton(),
-                const SizedBox(width: 8),
-                _buildFavoriteButton(),
-              ],
-            ),
-          ],
-        ),
+          ),
+          
+          // 操作按钮
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildShareButton(),
+              const SizedBox(width: 8),
+              _buildExportButton(),
+              const SizedBox(width: 8),
+              _buildFavoriteButton(),
+            ],
+          ),
+        ],
       ),
     );
   }
