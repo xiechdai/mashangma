@@ -15,7 +15,7 @@ dependencies:
     sdk: flutter
 
   # 剪贴板管理
-  clipboard: ^0.1.3
+  clipboard: ^3.0.8
 
   # 编码生成
   qr_flutter: ^4.1.0
@@ -30,12 +30,12 @@ dependencies:
   path: ^1.8.3
 
   # 系统功能
-  share_plus: ^7.2.1
-  screen_brightness: ^0.2.2+1
-  sensors_plus: ^4.0.2
+  share_plus: ^12.0.1
+  screen_brightness: ^2.1.7
+  sensors_plus: ^7.0.0
 
   # UI增强
-  flutter_slidable: ^3.0.1
+  flutter_slidable: ^4.0.3
   flutter_staggered_animations: ^1.1.1
 
   # 状态管理
