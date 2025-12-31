@@ -26,16 +26,11 @@ dependencies:
   path_provider: ^2.1.1
   shared_preferences: ^2.2.2
 
-  # 权限管理
-  permission_handler: ^11.1.0
-
   # 图片保存
-  image_gallery_saver: ^2.0.3
   path: ^1.8.3
 
   # 系统功能
   share_plus: ^7.2.1
-  gallery_saver: ^2.3.2
   screen_brightness: ^0.2.2+1
   sensors_plus: ^4.0.2
 
