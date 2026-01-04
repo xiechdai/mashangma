@@ -35,7 +35,7 @@ dependencies:
   sensors_plus: ^7.0.0
 
   # UI增强
-  flutter_slidable: ^4.0.3
+  flutter_slidable: ^3.0.0
   flutter_staggered_animations: ^1.1.1
 
   # 状态管理
